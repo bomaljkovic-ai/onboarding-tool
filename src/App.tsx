@@ -51,42 +51,48 @@ function Shell() {
   const open = mutaties.filter((m) => !m.ingetrokken && (m.taken || []).some((t) => !t.klaar)).length;
   const uitloggen = () => supabase.auth.signOut();
 
+  const naam = profiel?.naam || session.user.email || "";
+  const initialen = naam.split(/[\s@.]+/).filter(Boolean).slice(0, 2).map((x) => x[0]!.toUpperCase()).join("");
   const kop = (
-    <header className="bar">
-      <div className="titlebar">
-        <span className="tb-title">
-          <svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16"><rect x="1" y="2" width="14" height="11" fill="#C0C0C0" stroke="#000" /><rect x="2" y="3" width="12" height="2" fill="#000080" /><circle cx="6" cy="9" r="2" fill="#FFD800" stroke="#000" /><path d="M9 8h4M9 10h3" stroke="#000" /></svg>
-          Personeelsmutaties
-        </span>
-        <span className="tb-ctrl" aria-hidden="true"><i>_</i><i>□</i><i>×</i></span>
+    <header className="topbar">
+      <div className="tb-left">
+        <svg aria-hidden="true" width="18" height="18" viewBox="0 0 18 18" className="waffle">
+          {[2, 8, 14].flatMap((y) => [2, 8, 14].map((x) => <rect key={`${x}-${y}`} x={x - 1.5} y={y - 1.5} width="3" height="3" rx="0.5" />))}
+        </svg>
+        <span className="app">Personeelsmutaties</span>
       </div>
-      <div className="menubar">
-        {rol && (
-          <nav className="tabs" aria-label="Onderdelen">
-            <NavLink to="/overzicht">Overzicht</NavLink>
-            {(rol === "hr" || rol === "beheer") && <NavLink to="/nieuw">Nieuwe mutatie</NavLink>}
-            {rol === "beheer" && <NavLink to="/beheer">Beheer</NavLink>}
-          </nav>
-        )}
-        <div className="who">
-          <span>
-            {profiel?.naam || session.user.email}
-            {rol ? ` · ${ROL_LABEL[rol]}` : ""}
-          </span>
-          <button type="button" onClick={uitloggen}>Afmelden</button>
-        </div>
+      <div className="tb-right">
+        <span className="who-text">
+          <span className="who-name">{naam}</span>
+          {rol && <span className="who-rol">{ROL_LABEL[rol]}</span>}
+        </span>
+        <span className="avatar" aria-hidden="true">{initialen}</span>
+        <button type="button" className="tb-btn" onClick={uitloggen}>Afmelden</button>
       </div>
     </header>
   );
-  const status = (
-    <footer className="statusbar">
-      <span>{geladen ? "Gereed" : "Bezig met laden…"}</span>
-      <span>{mutaties.length} mutaties</span>
-      <span>{open} open</span>
-      <span>{profiel?.naam || session.user.email}</span>
-    </footer>
+  const ico = {
+    home: <path d="M3 9.5 10 4l7 5.5V16a1 1 0 0 1-1 1h-4v-5H8v5H4a1 1 0 0 1-1-1z" />,
+    nieuw: <><circle cx="8" cy="7" r="3" /><path d="M2.5 17c.5-3 2.7-4.5 5.5-4.5 1.2 0 2.3.3 3.2.8M15 11v6M12 14h6" /></>,
+    beheer: <><circle cx="10" cy="10" r="2.5" /><path d="M10 2.5v2M10 15.5v2M2.5 10h2M15.5 10h2M4.7 4.7l1.4 1.4M13.9 13.9l1.4 1.4M4.7 15.3l1.4-1.4M13.9 6.1l1.4-1.4" /></>,
+  };
+  const Ico = ({ d }: { d: ReactNode }) => (
+    <svg aria-hidden="true" width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">{d}</svg>
   );
-  const venster = (inhoud: ReactNode) => <div className="window">{kop}{inhoud}{status}</div>;
+  const nav = rol ? (
+    <nav className="sidenav" aria-label="Onderdelen">
+      <NavLink to="/overzicht"><Ico d={ico.home} /><span>Overzicht</span></NavLink>
+      {(rol === "hr" || rol === "beheer") && <NavLink to="/nieuw"><Ico d={ico.nieuw} /><span>Nieuwe mutatie</span></NavLink>}
+      {rol === "beheer" && <NavLink to="/beheer"><Ico d={ico.beheer} /><span>Beheer</span></NavLink>}
+      <div className="nav-foot">{mutaties.length} mutaties · {open} open</div>
+    </nav>
+  ) : null;
+  const venster = (inhoud: ReactNode) => (
+    <div className="shell">
+      {kop}
+      <div className="shell-body">{nav}{inhoud}</div>
+    </div>
+  );
 
   if (!geladen && !profiel) return venster(<main className="gut"><div className="empty">Laden…</div></main>);
 
