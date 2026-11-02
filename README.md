@@ -33,7 +33,7 @@ De database dwingt dit af met Row Level Security, dus ook iemand die de app omze
 
 ### 3. Lokaal draaien (optioneel)
 ```bash
-cp .env.example .env.local   # vul URL en anon-key in (Project Settings › API)
+cp .env.example .env.local   # vul URL en publishable key in (Project Settings › API Keys)
 npm install
 npm run dev
 ```
@@ -41,9 +41,9 @@ npm run dev
 ### 4. Online zetten
 De app is een statische site (`npm run build` → map `dist`). Hij werkt op elke host, omdat de navigatie via `#/` loopt en er geen serverinstellingen nodig zijn.
 
-**Vercel of Netlify:** importeer deze GitHub-repo, build command `npm run build`, output `dist`. Voeg de omgevingsvariabelen `VITE_SUPABASE_URL` en `VITE_SUPABASE_ANON_KEY` toe. Elke push naar `main` zet automatisch een nieuwe versie online.
+**Vercel of Netlify:** importeer deze GitHub-repo, build command `npm run build`, output `dist`. Voeg de omgevingsvariabelen `VITE_SUPABASE_URL` en `VITE_SUPABASE_PUBLISHABLE_KEY` toe. Elke push naar `main` zet automatisch een nieuwe versie online.
 
-De anon-key mag in de site staan; de beveiliging zit in de databaseregels. Zet nooit de **service_role**-key in de site.
+De publishable key (`sb_publishable_…`) mag in de site staan; de beveiliging zit in de databaseregels. Zet nooit een **secret key** (`sb_secret_…`) in de site.
 
 ## Takenlijsten aanpassen
 De taken per soort mutatie en systeem staan in de tabel `taak_sjablonen`. Pas ze aan in Supabase › Table Editor. Nieuwe mutaties gebruiken meteen de nieuwe lijst.

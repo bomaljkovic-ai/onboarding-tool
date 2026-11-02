@@ -36,7 +36,7 @@ export default function App() {
         <div className="panel card">
           <h1>Nog niet ingesteld</h1>
           <p style={{ margin: 0 }}>
-            De verbinding met Supabase ontbreekt. Vul <code>VITE_SUPABASE_URL</code> en <code>VITE_SUPABASE_ANON_KEY</code> in, lokaal in
+            De verbinding met Supabase ontbreekt. Vul <code>VITE_SUPABASE_URL</code> en <code>VITE_SUPABASE_PUBLISHABLE_KEY</code> in, lokaal in
             <code> .env.local</code> of bij je hostingdienst als omgevingsvariabelen. Zie de README.
           </p>
         </div>
