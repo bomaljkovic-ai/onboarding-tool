@@ -13,7 +13,7 @@ interface Form {
 
 const leeg = (locatie: string): Form => ({
   soort: "in", voornaam: "", achternaam: "", prive_email: "", telefoon: "", huidig_account: "", functie: "", afdeling: "",
-  leidinggevende: "", leidinggevende_email: "", datum: "", contract: "Vast", locatie, systemen: ["entra", "laptop"], opmerking: "",
+  leidinggevende: "", leidinggevende_email: "", datum: "", contract: "", locatie, systemen: ["entra", "laptop"], opmerking: "",
 });
 
 export default function Nieuw() {
@@ -61,8 +61,7 @@ export default function Nieuw() {
     const payload = {
       ...f,
       voornaam: f.voornaam.trim(), achternaam: f.achternaam.trim(), functie: f.functie.trim(),
-      contract: f.soort === "in" ? f.contract : "",
-      prive_email: f.soort === "in" ? f.prive_email.trim() : "", telefoon: f.soort === "in" ? f.telefoon.trim() : "",
+      prive_email: f.soort === "in" ? f.prive_email.trim() : "", telefoon: "",
       huidig_account: f.soort === "in" ? "" : f.huidig_account.trim(),
       systemen: SYSTEMEN.map((s) => s.id).filter((id) => f.systemen.includes(id)),
     };
@@ -98,7 +97,6 @@ export default function Nieuw() {
             {s === "in" ? (
               <>
                 <div><label htmlFor="f-prive">Privé e-mail (voor welkomstmail)</label><input type="email" id="f-prive" value={f.prive_email} onChange={(e) => zet("prive_email", e.target.value)} /></div>
-                <div><label htmlFor="f-tel">Mobiel nummer</label><input type="tel" id="f-tel" value={f.telefoon} onChange={(e) => zet("telefoon", e.target.value)} /></div>
               </>
             ) : (
               <div><label htmlFor="f-acc">Huidig e-mailadres op het werk</label><input type="email" id="f-acc" placeholder="voornaam.achternaam@…" value={f.huidig_account} onChange={(e) => zet("huidig_account", e.target.value)} /></div>
@@ -125,14 +123,6 @@ export default function Nieuw() {
             </div>
             <div><label htmlFor="f-lg-mail">E-mail leidinggevende</label><input type="email" id="f-lg-mail" value={f.leidinggevende_email} onChange={(e) => zet("leidinggevende_email", e.target.value)} /></div>
             <div><label htmlFor="f-datum" className="req">{datumLabel}</label><input type="date" id="f-datum" value={f.datum} onChange={(e) => zet("datum", e.target.value)} />{err("datum")}</div>
-            {s === "in" && (
-              <div>
-                <label htmlFor="f-contract">Contract</label>
-                <select id="f-contract" value={f.contract} onChange={(e) => zet("contract", e.target.value)}>
-                  {["Vast", "Tijdelijk", "Uitzend / inhuur", "Stagiair"].map((x) => <option key={x}>{x}</option>)}
-                </select>
-              </div>
-            )}
             <div>
               <label htmlFor="f-loc">Werklocatie</label>
               <select id="f-loc" value={f.locatie} onChange={(e) => zet("locatie", e.target.value)}>
