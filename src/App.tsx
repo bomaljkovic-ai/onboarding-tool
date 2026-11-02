@@ -20,13 +20,7 @@ export default function App() {
       setSession(data.session);
       setKlaar(true);
     });
-    const { data } = supabase.auth.onAuthStateChange((_e, s) => {
-      setSession(s);
-      // inlogcode uit het adres halen na het openen van de e-maillink
-      if (s && window.location.search.includes("code=")) {
-        window.history.replaceState(null, "", window.location.pathname + window.location.hash);
-      }
-    });
+    const { data } = supabase.auth.onAuthStateChange((_e, s) => setSession(s));
     return () => data.subscription.unsubscribe();
   }, []);
 

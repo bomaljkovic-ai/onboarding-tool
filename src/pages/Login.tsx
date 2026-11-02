@@ -1,11 +1,11 @@
 import { useState, type FormEvent } from "react";
-import { supabase } from "../lib/supabase";
+import { linkFout, supabase } from "../lib/supabase";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [bezig, setBezig] = useState(false);
   const [verstuurd, setVerstuurd] = useState(false);
-  const [fout, setFout] = useState<string | null>(null);
+  const [fout, setFout] = useState<string | null>(linkFout);
 
   async function verstuur(e: FormEvent) {
     e.preventDefault();
@@ -41,7 +41,7 @@ export default function Login() {
         {verstuurd ? (
           <div className="banner" role="status">
             <span>
-              Check je mail op <strong>{email}</strong> en klik op de link. Open de link in deze browser, anders werkt hij niet.
+              Check je mail op <strong>{email}</strong> en klik op de link.
             </span>
           </div>
         ) : (
