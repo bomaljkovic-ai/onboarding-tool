@@ -27,6 +27,11 @@ create trigger bij_nieuwe_gebruiker
   after insert on auth.users
   for each row execute function public.nieuwe_gebruiker();
 
+-- Gebruikers die al bestonden vóór deze opzet ook een profiel geven.
+insert into public.profielen (id, email)
+select id, email from auth.users where email is not null
+on conflict (id) do nothing;
+
 -- De rol van de ingelogde gebruiker (null = geen toegang).
 create or replace function public.mijn_rol()
 returns text language sql stable security definer set search_path = public as $$
