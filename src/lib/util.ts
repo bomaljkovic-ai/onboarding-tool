@@ -71,6 +71,16 @@ export function status(m: Mutatie): { key: StatusKey; label: string; cls: string
 
 const ps = (v: string | null | undefined) => String(v || "").replace(/[`"$]/g, (c) => "`" + c);
 
+function managerRegel(m: Mutatie, gebruiker: string): string {
+  if (!m.leidinggevende_email) return "";
+  return `
+# Leidinggevende instellen: ${ps(m.leidinggevende)}
+Set-MgUserManagerByRef -UserId ${gebruiker} -BodyParameter @{
+  "@odata.id" = "https://graph.microsoft.com/v1.0/users/${ps(m.leidinggevende_email)}"
+}
+`;
+}
+
 export function scriptEntra(m: Mutatie, upn: string): string {
   if (m.soort === "in") {
     const nick = upn.split("@")[0];
@@ -82,7 +92,7 @@ $wachtwoord = @{
   ForceChangePasswordNextSignIn = $true
 }
 
-New-MgUser \`
+$user = New-MgUser \`
   -DisplayName "${ps(volledigeNaam(m))}" \`
   -GivenName "${ps(m.voornaam)}" \`
   -Surname "${ps(m.achternaam)}" \`
@@ -93,7 +103,7 @@ New-MgUser \`
   -UsageLocation "NL" \`
   -AccountEnabled \`
   -PasswordProfile $wachtwoord
-
+${managerRegel(m, "$user.Id")}
 # Licentie en groepen daarna toewijzen in het Entra- of Microsoft 365-beheercentrum.`;
   }
   if (m.soort === "uit") {
@@ -113,7 +123,7 @@ Connect-MgGraph -Scopes "User.ReadWrite.All"
 Update-MgUser -UserId "${ps(upn)}" \`
   -JobTitle "${ps(m.functie)}" \`
   -Department "${ps(m.afdeling)}"
-
+${managerRegel(m, `"${ps(upn)}"`)}
 # Groepen aanpassen in het Entra-beheercentrum.`;
 }
 

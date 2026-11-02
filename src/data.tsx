@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { supabase } from "./lib/supabase";
-import type { Instellingen, Mutatie, Profiel, Rol } from "./lib/types";
+import type { Afdeling, Instellingen, Mutatie, Profiel, Rol } from "./lib/types";
 
 const STANDAARD: Instellingen = { domein: "", afdelingen: [], leidinggevenden: [], locaties: [] };
 
@@ -10,6 +10,7 @@ interface DataCtx {
   profiel: Profiel | null;
   rol: Rol | null;
   instellingen: Instellingen;
+  afdelingen: Afdeling[];
   mutaties: Mutatie[];
   profielen: Record<string, Profiel>;
   geladen: boolean;
@@ -31,6 +32,7 @@ export function DataProvider({ session, children }: { session: Session; children
   const [profiel, setProfiel] = useState<Profiel | null>(null);
   const [instellingen, setInstellingen] = useState<Instellingen>(STANDAARD);
   const [mutaties, setMutaties] = useState<Mutatie[]>([]);
+  const [afdelingen, setAfdelingen] = useState<Afdeling[]>([]);
   const [profielen, setProfielen] = useState<Record<string, Profiel>>({});
   const [geladen, setGeladen] = useState(false);
   const [fout, setFout] = useState<string | null>(null);
@@ -52,10 +54,12 @@ export function DataProvider({ session, children }: { session: Session; children
   }, [session.user.id]);
 
   const herlaad = useCallback(async () => {
-    const [m, i] = await Promise.all([
+    const [m, i, a] = await Promise.all([
       supabase.from("mutaties").select("*, taken(*)").order("datum", { ascending: true }),
       supabase.from("instellingen").select("domein,afdelingen,leidinggevenden,locaties").eq("id", 1).maybeSingle(),
+      supabase.from("afdelingen").select("naam,manager_naam,manager_email").order("naam"),
     ]);
+    if (!a.error) setAfdelingen((a.data as Afdeling[]) || []);
     if (m.error) setFout(m.error.message);
     else {
       setFout(null);
@@ -97,10 +101,10 @@ export function DataProvider({ session, children }: { session: Session; children
 
   const waarde = useMemo<DataCtx>(
     () => ({
-      session, profiel, rol: profiel?.rol ?? null, instellingen, mutaties, profielen, geladen, fout,
+      session, profiel, rol: profiel?.rol ?? null, instellingen, afdelingen, mutaties, profielen, geladen, fout,
       herlaad, herlaadProfielen, naamVan, toast,
     }),
-    [session, profiel, instellingen, mutaties, profielen, geladen, fout, herlaad, herlaadProfielen, naamVan, toast],
+    [session, profiel, instellingen, afdelingen, mutaties, profielen, geladen, fout, herlaad, herlaadProfielen, naamVan, toast],
   );
 
   return (

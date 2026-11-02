@@ -15,6 +15,12 @@ export interface Instellingen {
   locaties: string[];
 }
 
+export interface Afdeling {
+  naam: string;
+  manager_naam: string | null;
+  manager_email: string | null;
+}
+
 export interface Taak {
   id: string;
   mutatie_id: string;
@@ -44,6 +50,7 @@ export interface Mutatie {
   functie: string;
   afdeling: string;
   leidinggevende: string | null;
+  leidinggevende_email: string | null;
   datum: string;
   contract: string | null;
   locatie: string | null;

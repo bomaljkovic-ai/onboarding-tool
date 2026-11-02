@@ -19,7 +19,7 @@ De database dwingt dit af met Row Level Security, dus ook iemand die de app omze
 
 ### 1. Supabase-project
 1. Maak een project aan op [supabase.com](https://supabase.com). Kies regio Frankfurt of een andere EU-regio.
-2. Ga naar **SQL Editor**, plak de inhoud van `supabase/migrations/20261102000000_init.sql` en klik op **Run**.
+2. Ga naar **SQL Editor** en voer de bestanden in `supabase/migrations/` één voor één uit, in volgorde van naam (plakken en **Run**).
 3. Ga naar **Authentication › Sign In / Providers** en zet **Allow new users to sign up** uit. Dan kan alleen inloggen wie je uitnodigt.
 4. Ga naar **Authentication › URL Configuration** en vul bij **Site URL** het adres in waar de app komt te staan. Zet bij **Redirect URLs** ook `http://localhost:5173` als je lokaal wilt testen.
 

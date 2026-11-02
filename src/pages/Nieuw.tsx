@@ -7,17 +7,31 @@ import { foutTekst } from "../lib/util";
 
 interface Form {
   soort: Soort; voornaam: string; achternaam: string; prive_email: string; telefoon: string; huidig_account: string;
-  functie: string; afdeling: string; leidinggevende: string; datum: string; contract: string; locatie: string;
+  functie: string; afdeling: string; leidinggevende: string; leidinggevende_email: string; datum: string; contract: string; locatie: string;
   systemen: string[]; opmerking: string;
 }
 
 const leeg = (locatie: string): Form => ({
   soort: "in", voornaam: "", achternaam: "", prive_email: "", telefoon: "", huidig_account: "", functie: "", afdeling: "",
-  leidinggevende: "", datum: "", contract: "Vast", locatie, systemen: ["entra", "laptop"], opmerking: "",
+  leidinggevende: "", leidinggevende_email: "", datum: "", contract: "Vast", locatie, systemen: ["entra", "laptop"], opmerking: "",
 });
 
 export default function Nieuw() {
-  const { instellingen, toast, herlaad } = useData();
+  const { instellingen, afdelingen, toast, herlaad } = useData();
+  const afdNamen = afdelingen.length ? afdelingen.map((a) => a.naam) : instellingen.afdelingen;
+  const managers = afdelingen.filter((a) => a.manager_naam);
+
+  // Afdeling gekozen: leidinggevende van die afdeling invullen
+  const kiesAfdeling = (naam: string) => {
+    const a = afdelingen.find((x) => x.naam === naam);
+    setF((o) => ({ ...o, afdeling: naam, leidinggevende: a?.manager_naam || "", leidinggevende_email: a?.manager_email || "" }));
+    if (fouten.afdeling) setFouten((o) => { const n = { ...o }; delete n.afdeling; return n; });
+  };
+  // Leidinggevende getypt of gekozen: e-mail erbij zoeken
+  const kiesLeidinggevende = (naam: string) => {
+    const a = managers.find((x) => x.manager_naam?.toLowerCase() === naam.trim().toLowerCase());
+    setF((o) => ({ ...o, leidinggevende: naam, leidinggevende_email: a ? a.manager_email || "" : o.leidinggevende_email }));
+  };
   const [f, setF] = useState<Form>(() => leeg(instellingen.locaties[0] || ""));
   const [fouten, setFouten] = useState<Record<string, string>>({});
   const [bezig, setBezig] = useState(false);
@@ -97,16 +111,19 @@ export default function Nieuw() {
             <div><label htmlFor="f-functie" className="req">Functie</label><input type="text" id="f-functie" value={f.functie} onChange={(e) => zet("functie", e.target.value)} />{err("functie")}</div>
             <div>
               <label htmlFor="f-afdeling" className="req">Afdeling</label>
-              <select id="f-afdeling" value={f.afdeling} onChange={(e) => zet("afdeling", e.target.value)}>
+              <select id="f-afdeling" value={f.afdeling} onChange={(e) => kiesAfdeling(e.target.value)}>
                 <option value="">Kies…</option>
-                {instellingen.afdelingen.map((x) => <option key={x}>{x}</option>)}
+                {afdNamen.map((x) => <option key={x}>{x}</option>)}
               </select>{err("afdeling")}
             </div>
             <div>
               <label htmlFor="f-lg">Leidinggevende</label>
-              <input type="text" id="f-lg" list="lg-lijst" value={f.leidinggevende} onChange={(e) => zet("leidinggevende", e.target.value)} />
-              <datalist id="lg-lijst">{instellingen.leidinggevenden.map((x) => <option key={x} value={x} />)}</datalist>
+              <input type="text" id="f-lg" list="lg-lijst" value={f.leidinggevende} onChange={(e) => kiesLeidinggevende(e.target.value)} />
+              <datalist id="lg-lijst">
+                {(managers.length ? managers.map((a) => a.manager_naam as string) : instellingen.leidinggevenden).map((x) => <option key={x} value={x} />)}
+              </datalist>
             </div>
+            <div><label htmlFor="f-lg-mail">E-mail leidinggevende</label><input type="email" id="f-lg-mail" value={f.leidinggevende_email} onChange={(e) => zet("leidinggevende_email", e.target.value)} /></div>
             <div><label htmlFor="f-datum" className="req">{datumLabel}</label><input type="date" id="f-datum" value={f.datum} onChange={(e) => zet("datum", e.target.value)} />{err("datum")}</div>
             {s === "in" && (
               <div>

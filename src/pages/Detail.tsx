@@ -209,7 +209,7 @@ function Gegevens({ m }: { m: Mutatie }) {
         {rij("Naam", volledigeNaam(m))}
         {rij("Functie", m.functie)}
         {rij("Afdeling", m.afdeling)}
-        {rij("Leidinggevende", m.leidinggevende)}
+        {rij("Leidinggevende", [m.leidinggevende, m.leidinggevende_email].filter(Boolean).join(" · "))}
         {rij("Datum", fmtDatum(m.datum, true))}
         {rij("Werklocatie", m.locatie)}
         {m.soort === "in" ? (<>{rij("Contract", m.contract)}{rij("Privé e-mail", m.prive_email)}{rij("Mobiel", m.telefoon)}</>) : rij("Huidig e-mailadres", m.huidig_account)}
