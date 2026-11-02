@@ -1,1 +1,0 @@
-{"root":["./src/App.tsx","./src/data.tsx","./src/main.tsx","./src/lib/supabase.ts","./src/lib/types.ts","./src/lib/util.ts","./src/pages/Beheer.tsx","./src/pages/Detail.tsx","./src/pages/Login.tsx","./src/pages/NaamBanner.tsx","./src/pages/Nieuw.tsx","./src/pages/Overzicht.tsx"],"version":"5.6.3"}
