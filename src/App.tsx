@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { NavLink, Navigate, Route, Routes } from "react-router-dom";
 import type { Session } from "@supabase/supabase-js";
 import { configOk, supabase } from "./lib/supabase";
@@ -47,20 +47,20 @@ export default function App() {
 }
 
 function Shell() {
-  const { profiel, rol, geladen, session } = useData();
+  const { profiel, rol, geladen, session, mutaties } = useData();
+  const open = mutaties.filter((m) => !m.ingetrokken && (m.taken || []).some((t) => !t.klaar)).length;
   const uitloggen = () => supabase.auth.signOut();
 
   const kop = (
     <header className="bar">
-      <div className="bar-in gut">
-        <div className="brand">
-          <i aria-hidden="true">
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M19 8v6M22 11h-6" />
-            </svg>
-          </i>
+      <div className="titlebar">
+        <span className="tb-title">
+          <svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16"><rect x="1" y="2" width="14" height="11" fill="#C0C0C0" stroke="#000" /><rect x="2" y="3" width="12" height="2" fill="#000080" /><circle cx="6" cy="9" r="2" fill="#FFD800" stroke="#000" /><path d="M9 8h4M9 10h3" stroke="#000" /></svg>
           Personeelsmutaties
-        </div>
+        </span>
+        <span className="tb-ctrl" aria-hidden="true"><i>_</i><i>□</i><i>×</i></span>
+      </div>
+      <div className="menubar">
         {rol && (
           <nav className="tabs" aria-label="Onderdelen">
             <NavLink to="/overzicht">Overzicht</NavLink>
@@ -73,18 +73,25 @@ function Shell() {
             {profiel?.naam || session.user.email}
             {rol ? ` · ${ROL_LABEL[rol]}` : ""}
           </span>
-          <button type="button" onClick={uitloggen}>Uitloggen</button>
+          <button type="button" onClick={uitloggen}>Afmelden</button>
         </div>
       </div>
     </header>
   );
+  const status = (
+    <footer className="statusbar">
+      <span>{geladen ? "Gereed" : "Bezig met laden…"}</span>
+      <span>{mutaties.length} mutaties</span>
+      <span>{open} open</span>
+      <span>{profiel?.naam || session.user.email}</span>
+    </footer>
+  );
+  const venster = (inhoud: ReactNode) => <div className="window">{kop}{inhoud}{status}</div>;
 
-  if (!geladen && !profiel) return <>{kop}<main className="gut"><div className="empty">Laden…</div></main></>;
+  if (!geladen && !profiel) return venster(<main className="gut"><div className="empty">Laden…</div></main>);
 
   if (!rol) {
-    return (
-      <>
-        {kop}
+    return venster(
         <main className="gut">
           <div className="panel" style={{ maxWidth: 640 }}>
             <h1>Nog geen toegang</h1>
@@ -94,13 +101,10 @@ function Shell() {
             </p>
           </div>
         </main>
-      </>
     );
   }
 
-  return (
-    <>
-      {kop}
+  return venster(
       <main className="gut">
         <NaamBanner />
         <Routes>
@@ -111,6 +115,5 @@ function Shell() {
           <Route path="*" element={<Navigate to="/overzicht" replace />} />
         </Routes>
       </main>
-    </>
   );
 }
