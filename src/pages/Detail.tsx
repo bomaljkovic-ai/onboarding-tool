@@ -157,13 +157,18 @@ export default function Detail() {
             </section>
           )}
 
-          {heeft("shopify") && (
+          {(heeft("shopify_admin") || heeft("shopify_pos") || heeft("shopify")) && (
             <section className="panel">
               <h2>Shopify</h2>
               <dl className="facts">
                 <div><dt>E-mailadres</dt><dd className="mono">{huidigeUpn}</dd></div>
                 <div><dt>Waar</dt><dd>Shopify-admin › Instellingen › Gebruikers</dd></div>
-                <div><dt>Actie</dt><dd>{m.soort === "in" ? `Medewerker uitnodigen, rechten zoals collega's op ${m.afdeling}` : m.soort === "uit" ? "Account deactiveren of verwijderen" : `Rechten aanpassen aan ${m.afdeling}`}</dd></div>
+                {(heeft("shopify_admin") || heeft("shopify")) && (
+                  <div><dt>Admin-account</dt><dd>{m.soort === "in" ? `Uitnodigen, rechten zoals collega's op ${m.afdeling}` : m.soort === "uit" ? "Deactiveren of verwijderen" : `Rechten aanpassen aan ${m.afdeling}`}</dd></div>
+                )}
+                {heeft("shopify_pos") && (
+                  <div><dt>POS-account</dt><dd>{m.soort === "in" ? "POS-medewerker toevoegen en pincode laten instellen" : m.soort === "uit" ? "POS-toegang intrekken" : "POS-rechten aanpassen"}</dd></div>
+                )}
               </dl>
             </section>
           )}

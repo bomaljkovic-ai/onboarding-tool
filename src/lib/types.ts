@@ -65,8 +65,11 @@ export interface Mutatie {
 
 export const SYSTEMEN: { id: string; label: string; kort: string }[] = [
   { id: "entra", label: "Microsoft 365-account (Entra)", kort: "Entra" },
-  { id: "shopify", label: "Shopify-medewerkersaccount", kort: "Shopify" },
-  { id: "odoo", label: "Odoo-gebruiker", kort: "Odoo" },
+  { id: "google", label: "Google-account (Budgetcam)", kort: "Google" },
+  { id: "shopify_pos", label: "Shopify POS-account", kort: "Shopify POS" },
+  { id: "shopify_admin", label: "Shopify admin-account", kort: "Shopify admin" },
+  { id: "odoo", label: "Odoo-account", kort: "Odoo" },
+  { id: "roots", label: "Roots", kort: "Roots" },
   { id: "laptop", label: "Laptop", kort: "Laptop" },
   { id: "telefoon", label: "Telefoon / simkaart", kort: "Telefoon" },
   { id: "pas", label: "Toegangspas", kort: "Pas" },
